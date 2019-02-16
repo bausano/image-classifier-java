@@ -18,8 +18,8 @@ public class Main {
 	    DataSet data = DataSet.from(Paths.get(Settings.TRAINING_FILE_PATH), Settings.CROSSFOLD_FACTOR);
 
 	    // Instantiates nearest neighbour algorithm.
-        NearestNeighbour algorithm = new NearestNeighbour(data.setForTraining);
+        NearestNeighbour knn = new NearestNeighbour(data.setForTraining);
 
-        Reporter.assess("Nearest neighbour", algorithm, data.setForValidation);
+        Reporter.assess("Nearest neighbour", knn, data.setForValidation);
     }
 }
