@@ -14,4 +14,9 @@ public class Settings {
      */
     public static final int CROSSFOLD_FACTOR = 7;
 
+    /**
+     * File path to the training file relative to the project root.
+     */
+    public static final String TRAINING_FILE_PATH = "data/training-data.txt";
+
 }

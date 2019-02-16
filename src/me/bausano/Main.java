@@ -15,7 +15,7 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
         // Loads the training data input.
-	    DataSet data = DataSet.from(Paths.get("data/training-data.txt"), Settings.CROSSFOLD_FACTOR);
+	    DataSet data = DataSet.from(Paths.get(Settings.TRAINING_FILE_PATH), Settings.CROSSFOLD_FACTOR);
 
 	    // Instantiates nearest neighbour algorithm.
         NearestNeighbour algorithm = new NearestNeighbour(data.setForTraining);
