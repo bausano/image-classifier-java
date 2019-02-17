@@ -11,10 +11,15 @@ public class Settings {
     public static final int INPUT_PARAMETERS_LENGTH = 64;
 
     /**
+     * How many output classes are there. For digit classification, there's 10 (0-9).
+     */
+    public static final int OUTPUT_CLASSES_COUNT = 10;
+
+    /**
      * What portion of training data should be used for cross fold validation. The program will omit these data when it
      * trains. Then it uses that data to calculate how successful the program is.
      */
-    public static final int CROSSFOLD_FACTOR = 10;
+    public static final int CROSSFOLD_FACTOR = 2;
 
     /**
      * File path to the training file relative to the project root.

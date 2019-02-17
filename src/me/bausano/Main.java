@@ -16,16 +16,11 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
         // Loads the training data input.
-	    DataSet data = DataSet.from(Paths.get(Settings.TRAINING_FILE_PATH), Settings.CROSSFOLD_FACTOR);
+        DataSet data = DataSet.from(Paths.get(Settings.TRAINING_FILE_PATH), Settings.CROSSFOLD_FACTOR);
 
 	    // Instantiates nearest neighbour algorithm.
         NearestNeighbour knn = new NearestNeighbour(data.setForTraining);
 
-        Reporter.assess("Nearest neighbour", knn, data.setForValidation);
-
-        // Instantiates untrained deep neural network.
-        NeuralNetwork dnn = NeuralNetwork.fromBlueprint(new int[]{64, 37, 10});
-
-        Reporter.assess("Neural network", dnn, data.setForValidation);
+        Reporter.printConfusionMatrix(knn, data.setForValidation);
     }
 }

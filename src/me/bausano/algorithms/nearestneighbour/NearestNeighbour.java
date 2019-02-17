@@ -56,8 +56,8 @@ public class NearestNeighbour implements Classifier {
 
         // We assume both arrays will have adequate number of elements. These assumptions might possibly result in
         // better overall performance.
-        for (int index = 0; index < Settings.INPUT_PARAMETERS_LENGTH; index++) {
-            int difference = from[index] - to[index];
+        for (int pixel = 0; pixel < Settings.INPUT_PARAMETERS_LENGTH; pixel++) {
+            int difference = from[pixel] - to[pixel];
 
             sum += difference * difference;
         }
