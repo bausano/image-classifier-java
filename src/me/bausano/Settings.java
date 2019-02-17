@@ -1,5 +1,7 @@
 package me.bausano;
 
+import me.bausano.algorithms.neuralnetwork.ActivationMapper;
+
 public class Settings {
 
     /**
@@ -24,5 +26,10 @@ public class Settings {
      * algorithms, to train it nor to cross validate it.
      */
     public static final String TESTING_FILE_PATH = "data/testing-data.txt";
+
+    /**
+     * Activation function is used throughout all layers to indulge linearity.
+     */
+    public static final ActivationMapper activation = ActivationMapper.sigmoid();
 
 }

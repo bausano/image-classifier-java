@@ -1,6 +1,7 @@
 package me.bausano;
 
 import me.bausano.algorithms.nearestneighbour.NearestNeighbour;
+import me.bausano.algorithms.neuralnetwork.NeuralNetwork;
 
 import java.nio.file.Paths;
 
@@ -21,5 +22,10 @@ public class Main {
         NearestNeighbour knn = new NearestNeighbour(data.setForTraining);
 
         Reporter.assess("Nearest neighbour", knn, data.setForValidation);
+
+        // Instantiates untrained deep neural network.
+        NeuralNetwork dnn = NeuralNetwork.fromBlueprint(new int[]{64, 37, 10});
+
+        Reporter.assess("Neural network", dnn, data.setForValidation);
     }
 }
