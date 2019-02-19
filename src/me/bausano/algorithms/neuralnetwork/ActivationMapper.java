@@ -32,8 +32,8 @@ public class ActivationMapper {
      */
     public static ActivationMapper sigmoid() {
         return new ActivationMapper(
-                x -> 1d / (1 + Math.pow(Math.E, -x)),
-                x -> x * (1 - x)
+                x -> 1d / (1d + Math.pow(Math.E, -x)),
+                x -> x * (1d - x)
         );
     }
 

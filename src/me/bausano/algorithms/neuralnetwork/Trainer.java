@@ -7,7 +7,7 @@ public class Trainer {
     /**
      * Sets number of iteration so that the network always finishes the training when the learning rate is lowest.
      */
-    private final int iterations = Settings.CYCLES * (Settings.STEP_SIZE * 2) + Settings.STEP_SIZE + 1;
+    private final int iterations = Settings.CYCLES * (Settings.STEP_SIZE * 3) + 1;
 
     /**
      * Used to map neurons to classes. Indices are target classes (digits 0-9) and values are associated neurons.
@@ -38,6 +38,11 @@ public class Trainer {
      * Caches the updates to biases.
      */
     private double[][] biasNudges;
+
+    /**
+     * We have to take an average from all nudges updates, therefore we need a counter.
+     */
+    private int nudgesSinceLastCommit;
 
     /**
      * @param network Neural network to train
@@ -91,6 +96,7 @@ public class Trainer {
     private void clearCache() {
         weightNudges = new double[network.layers.length][][];
         biasNudges = new double[network.layers.length][];
+        nudgesSinceLastCommit = 0;
     }
 
     /**
@@ -155,8 +161,8 @@ public class Trainer {
         double[][] activationsMatrix = new double[network.layers.length + 1][];
         // Activation matrix includes inputs, so all layer indices are shifted to n + 1. Wish there were well
         // performable streams in Java as all of these computations are made to be done in a functional way.
-        // Unfortunately streams has about 5 times worse performance in Java, which brings me to conclusion that it's
-        // not a good language to be doing machine learning in.
+        // Unfortunately streams has about 5 times worse performance in Java, which along with the fact that it has non
+        // zero cost abstractions brings me to conclusion that it's not a good language to be doing machine learning in.
         activationsMatrix[0] = sample.clone();
 
         // Folding the layer array by inputting outputs from previous layers into the next one.
@@ -179,7 +185,7 @@ public class Trainer {
 
         for (int neuronIndex = 0; neuronIndex < activations.length; neuronIndex++) {
             // Formula -(target - output) that emerges from the chain rule.
-            double totalToOutputError = -((target == neuronIndex ? 1d : 0d)) - activations[neuronIndex];
+            double totalToOutputError = -((target == neuronIndex ? 1d : 0d) - activations[neuronIndex]);
             // The derivative of activation function computed from the value of the activation function over the net.
             // Functions with steeper derivatives converge faster.
             double derivative = Settings.activation.derivative.apply(activations[neuronIndex]);
@@ -197,7 +203,7 @@ public class Trainer {
      *
      * @param layerIndex Layer to perform the updates for
      * @param previousErrors Errors from previous layer that are used to follow the chain rule
-     * @param activationMatrix Activation
+     * @param activationMatrix Activations
      * @return Layer contribution to total error
      */
     private double[] addNudgesAndReturnErrors(int layerIndex, double[] previousErrors, double[][] activationMatrix) {
@@ -226,7 +232,7 @@ public class Trainer {
                     // And last but not least, we take the weight from that neuron that connects that neuron in the next
                     // layer to the currently iterated over in this layer. It's funny how much neater this looks with
                     // functional programming style of folding the arrays.
-                    totalError += network.layers[layerIndex + 1].neurons[errorIndex][neuronIndex];
+                    totalError += network.layers[layerIndex + 1].neurons[errorIndex][neuronIndex] * previousErrors[errorIndex];
                 }
 
                 currentError = derivative * totalError;
@@ -259,8 +265,9 @@ public class Trainer {
     private void addNudgesForNeuron(int layer, int neuron, double[] nudges, double biasNudge) {
         // If the array are not initialized, prepare them.
         if (weightNudges[layer] == null) {
-            weightNudges[layer] = new double[network.layers.length][network.layers[neuron].neurons.length];
-            biasNudges[layer] = new double[network.layers.length];
+            double[][] neurons = network.layers[layer].neurons;
+            weightNudges[layer] = new double[neurons.length][neurons[neuron].length];
+            biasNudges[layer] = new double[neurons.length];
         }
 
         biasNudges[layer][neuron] = biasNudge;
@@ -269,12 +276,19 @@ public class Trainer {
         for (int weightIndex = 0; weightIndex < weightNudges[layer][neuron].length; weightIndex++) {
             weightNudges[layer][neuron][weightIndex] += nudges[weightIndex];
         }
+
+        nudgesSinceLastCommit++;
     }
 
     /**
      * Commits all cached nudges to the layers weights and biases.
      */
     private void commitNudges() {
+        // Avoid division by zero.
+        if (nudgesSinceLastCommit == 0) {
+            return;
+        }
+
         // For each layer, each layer's neuron and each neuron's weight, perform an update.
         for (int layerIndex = 0; layerIndex < network.layers.length; layerIndex++) {
             Layer layer = network.layers[layerIndex];
@@ -282,11 +296,11 @@ public class Trainer {
             // Updates bias. Since trainer is trying to achieve minimum possible error (we are minimizing the function),
             // we have to deduct the nudges from the current bias and weights.
             for (int neuronIndex = 0; neuronIndex < layer.neurons.length; neuronIndex++) {
-                layer.biases[neuronIndex] -= biasNudges[layerIndex][neuronIndex];
+                layer.biases[neuronIndex] -= biasNudges[layerIndex][neuronIndex] / nudgesSinceLastCommit;
 
                 // Updating the weights.
                 for (int weightIndex = 0; weightIndex < layer.neurons[neuronIndex].length; weightIndex++) {
-                    layer.neurons[neuronIndex][weightIndex] -= weightNudges[layerIndex][neuronIndex][weightIndex];
+                    layer.neurons[neuronIndex][weightIndex] -= weightNudges[layerIndex][neuronIndex][weightIndex] / nudgesSinceLastCommit;
                 }
             }
         }

@@ -2,6 +2,7 @@ package me.bausano;
 
 import me.bausano.algorithms.nearestneighbour.NearestNeighbour;
 import me.bausano.algorithms.neuralnetwork.NeuralNetwork;
+import me.bausano.algorithms.neuralnetwork.Trainer;
 
 import java.nio.file.Paths;
 
@@ -17,5 +18,11 @@ public class Main {
     public static void main(String[] args) throws Exception {
         // Loads the training data input.
         DataSet data = DataSet.from(Paths.get(Settings.TRAINING_FILE_PATH), Settings.CROSSFOLD_FACTOR);
+
+        // Creates and trains a network.
+        NeuralNetwork network = NeuralNetwork.fromBlueprint(new int[]{ 64, 24, 10 });
+        new Trainer(network, data.setForTraining).train();
+
+        Reporter.assess("Neural Network", network, data.setForValidation);
     }
 }

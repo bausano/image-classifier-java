@@ -19,7 +19,7 @@ public class Settings {
      * What portion of training data should be used for cross fold validation. The program will omit these data when it
      * trains. Then it uses that data to calculate how successful the program is.
      */
-    public static final int CROSSFOLD_FACTOR = 2;
+    public static final int CROSSFOLD_FACTOR = 10;
 
     /**
      * After how many data samples should the neural network update its weights.
@@ -33,11 +33,11 @@ public class Settings {
 
     /**
      * Used to calculate number of iterations for training. The formula is
-     * iterations = CYCLES * (STEP_SIZE * 2) + STEP_SIZE + 1
+     * iterations = CYCLES * (STEP_SIZE * 3) + 1
      * This ensures that the network will stop training the when learning rate is the lowest, which gives the best
      * accuracy.
      */
-    public static final int CYCLES = 10;
+    public static final int CYCLES = 50;
 
     /**
      * Initial learning rate that will decrease with each epoch and also cycled around.
