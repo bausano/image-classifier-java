@@ -8,27 +8,27 @@ public class NearestNeighbour implements Classifier {
     /**
      * Data set of structured input data to match against.
      */
-    private final int[][] neighbours;
+    private final double[][] neighbours;
 
     /**
      * @param neighbours Input data set where last int is the class
      */
-    public NearestNeighbour(int[][] neighbours) {
+    public NearestNeighbour(double[][] neighbours) {
         this.neighbours = neighbours;
     }
 
     /**
      * @inheritDoc
      */
-    public int classify (int[] digit) {
+    public int classify (double[] digit) {
         // How close was the closest neighbour to the digit.
-        int closestDistance = Integer.MAX_VALUE;
+        double closestDistance = Double.MAX_VALUE;
         // Which class had the closest distance.
         int closestClass = 0;
 
-        for (int[] neighbour : neighbours) {
+        for (double[] neighbour : neighbours) {
             // Calculates how similar the digit is to iterated neighbour.
-            int distance = calculateDistance(digit, neighbour);
+            double distance = calculateDistance(digit, neighbour);
 
             // If there was a neighbour with lower distance, go to next iteration.
             if (distance > closestDistance) {
@@ -36,7 +36,7 @@ public class NearestNeighbour implements Classifier {
             }
 
             // The last element of array is the classification.
-            closestClass = neighbour[neighbour.length - 1];
+            closestClass = (int) neighbour[neighbour.length - 1];
             closestDistance = distance;
         }
 
@@ -51,13 +51,13 @@ public class NearestNeighbour implements Classifier {
      * @param to Point which has at least Settings.INPUT_PARAMETERS_LENGTH length
      * @return Distance between the two multi dimensional points
      */
-    private int calculateDistance (int[] from, int[] to) {
+    private double calculateDistance (double[] from, double[] to) {
         int sum = 0;
 
         // We assume both arrays will have adequate number of elements. These assumptions might possibly result in
         // better overall performance.
         for (int pixel = 0; pixel < Settings.INPUT_PARAMETERS_LENGTH; pixel++) {
-            int difference = from[pixel] - to[pixel];
+            double difference = from[pixel] - to[pixel];
 
             sum += difference * difference;
         }

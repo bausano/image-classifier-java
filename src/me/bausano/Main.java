@@ -17,10 +17,5 @@ public class Main {
     public static void main(String[] args) throws Exception {
         // Loads the training data input.
         DataSet data = DataSet.from(Paths.get(Settings.TRAINING_FILE_PATH), Settings.CROSSFOLD_FACTOR);
-
-	    // Instantiates nearest neighbour algorithm.
-        NearestNeighbour knn = new NearestNeighbour(data.setForTraining);
-
-        Reporter.printConfusionMatrix(knn, data.setForValidation);
     }
 }

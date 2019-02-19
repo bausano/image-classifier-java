@@ -10,12 +10,12 @@ public class DataSet {
     /**
      * The loaded data from file that is used to train the network.
      */
-    public final int[][] setForTraining;
+    public final double[][] setForTraining;
 
     /**
      * The loaded data from file that is used to asses the network's performance.
      */
-    public final int[][] setForValidation;
+    public final double[][] setForValidation;
 
     /**
      * Instantiates data for training.
@@ -23,7 +23,7 @@ public class DataSet {
      * @param trainingData Array of digits that are going to be used for training
      * @param validatingData Array of digits that are going to be used for validation
      */
-    private DataSet(int[][] trainingData, int[][] validatingData) {
+    private DataSet(double[][] trainingData, double[][] validatingData) {
         this.setForTraining = trainingData;
         this.setForValidation = validatingData;
     }
@@ -33,8 +33,8 @@ public class DataSet {
      *
      * @param validatingData Array of digits that are going to be used for assessing the performance
      */
-    private DataSet(int[][] validatingData) {
-        this.setForTraining = new int[0][Settings.INPUT_PARAMETERS_LENGTH];
+    private DataSet(double[][] validatingData) {
+        this.setForTraining = new double[0][Settings.INPUT_PARAMETERS_LENGTH];
         this.setForValidation = validatingData;
     }
 
@@ -46,18 +46,18 @@ public class DataSet {
      *                      input file
      */
     public static DataSet from (Path path, int factor) throws IOException {
-        int[][] data = Files.lines(path)
+        double[][] data = Files.lines(path)
             .filter((String line) -> !line.equals(""))
             .map(String::trim)
             .map(DataSet::convertToDigit)
-            .toArray(int[][]::new);
+            .toArray(double[][]::new);
 
         if (factor == 0) {
             return new DataSet(data);
         }
 
         // All data with index lower than boundary are training data (exclusive), all above are validating data.
-        int boundaryIndex = (data.length / Settings.CROSSFOLD_FACTOR * (Settings.CROSSFOLD_FACTOR - 1)) ;
+        int boundaryIndex = data.length / Settings.CROSSFOLD_FACTOR * (Settings.CROSSFOLD_FACTOR - 1) ;
 
         // Splits the data into two arrays.
         return new DataSet(
@@ -70,11 +70,11 @@ public class DataSet {
      * Converts line to digit. A digit is represented by an array of 65 integers.
      *
      * @param line A single line from the data set file
-     * @return Array of integers representing pixels and the last integer represents the class
+     * @return Array of doubles representing pixels and the last integer represents the class
      */
-    private static int[] convertToDigit(String line) {
+    private static double[] convertToDigit(String line) {
         return Arrays.stream(line.split(","))
-                .mapToInt(Integer::parseInt)
+                .mapToDouble(Double::parseDouble)
                 .toArray();
     }
 

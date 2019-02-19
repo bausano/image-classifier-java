@@ -8,6 +8,6 @@ public interface Classifier {
      * @param digit Digit we want to find match for
      * @return Class of the neighbour that resembled the digit the most
      */
-    int classify (int[] digit);
+    int classify (double[] digit);
 
 }

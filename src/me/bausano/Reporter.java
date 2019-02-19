@@ -12,9 +12,9 @@ public class Reporter {
      * @param classifier Algorithm reference
      * @param data Validation data
      */
-    public static void assess (String title, Classifier classifier, int[][] data) {
+    public static void assess (String title, Classifier classifier, double[][] data) {
         int correctlyClassified = 0;
-        for (int[] digit : data) {
+        for (double[] digit : data) {
             if (classifier.classify(digit) == digit[digit.length - 1]) {
                 correctlyClassified++;
             }
@@ -36,15 +36,15 @@ public class Reporter {
      * @param classifier Algorithm that classifies digits
      * @param data Data that is preferably not included in the neighbours
      */
-    public static void printConfusionMatrix (Classifier classifier, int[][] data) {
+    public static void printConfusionMatrix (Classifier classifier, double[][] data) {
         // Matrix where rows are classes and columns their classifications.
         int[][] matrix = new int[Settings.OUTPUT_CLASSES_COUNT][Settings.OUTPUT_CLASSES_COUNT];
 
-        for (int[] digit : data) {
+        for (double[] digit : data) {
             // Rows represent target correct classes and columns represent how many times that class has been classified
             // as certain class. If first row was [10, 0, 1, ...], that would mean that class 0 was classified as 0 ten
             // times (a.k.a. correctly), as 1 zero times, as 2 one time...
-            matrix[digit[digit.length - 1]][classifier.classify(digit)]++;
+            matrix[(int) digit[digit.length - 1]][classifier.classify(digit)]++;
         }
 
         System.out.println("--- Confusion matrix ----------");

@@ -12,10 +12,10 @@ public class NeuralNetwork implements Classifier {
      * Array of network layers. The input layer is not included and is only abstract. Therefore a network that has
      * structure [64, 36, 10] will have two layers behind the scenes.
      */
-    private Layer[] layers;
+    public Layer[] layers;
 
     /**
-     * Used to map neurons to classes. Indices are target classes (digits 0-9) and values are associated neurons.
+     * Used to map neurons to classes. Indices associated neurons and values are output classes.
      */
     private final int[] classMapping;
 
@@ -81,7 +81,7 @@ public class NeuralNetwork implements Classifier {
     /**
      * @inheritDoc
      */
-    public int classify (int[] digit) {
+    public int classify (double[] digit) {
         int candidate = 0;
         double candidateProbability = Double.MIN_VALUE;
 
@@ -100,7 +100,7 @@ public class NeuralNetwork implements Classifier {
             candidateProbability = probabilities[neuronIndex];
         }
 
-        return candidate;
+        return classMapping[candidate];
     }
 
     /**
@@ -109,9 +109,9 @@ public class NeuralNetwork implements Classifier {
      * @param digit Input digit with pixels
      * @return Activations for each output neuron
      */
-    private double[] feedForward (int[] digit) {
-        // Clones and converts input digit integers into doubles.
-        double[] carry = Arrays.stream(digit).asDoubleStream().toArray();
+    private double[] feedForward (double[] digit) {
+        // Clones the input digit.
+        double[] carry = Arrays.stream(digit).toArray();
 
         // Folds the layers array feeding forward the outputs from one layer to next as inputs.
         for (Layer layer : layers) {
