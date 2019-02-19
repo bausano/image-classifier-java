@@ -10,11 +10,6 @@ public class Trainer {
     private final int iterations = Settings.CYCLES * (Settings.STEP_SIZE * 3) + 1;
 
     /**
-     * Used to map neurons to classes. Indices are target classes (digits 0-9) and values are associated neurons.
-     */
-    private final int[] classMapping;
-
-    /**
      * Training data.
      */
     private final double[][] data;
@@ -47,23 +42,10 @@ public class Trainer {
     /**
      * @param network Neural network to train
      * @param data Training data
-     * @param classMapping Maps target classes to neurons
-     */
-    public Trainer(NeuralNetwork network, double[][] data, int[] classMapping) {
-        this.data = data;
-        this.network = network;
-        this.classMapping = classMapping;
-        clearCache();
-    }
-
-    /**
-     * @param network Neural network to train
-     * @param data Training data
      */
     public Trainer(NeuralNetwork network, double[][] data) {
         this.data = data;
         this.network = network;
-        this.classMapping = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         clearCache();
     }
 
@@ -132,7 +114,7 @@ public class Trainer {
      */
     private void learnSample(double[] sample) {
         // Converts digit class to expected neuron.
-        int target = classMapping[(int) sample[sample.length - 1]];
+        int target = network.mapDigitToNeuron[(int) sample[sample.length - 1]];
 
         // Matrix with each neuron's activation. If we want to implement other activation functions, this would have to
         // include net (pre squashed by activation function) as well as out values.

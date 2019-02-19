@@ -1,5 +1,7 @@
 package me.bausano;
 
+import me.bausano.algorithms.Classifier;
+import me.bausano.algorithms.collab.Collab;
 import me.bausano.algorithms.nearestneighbour.NearestNeighbour;
 import me.bausano.algorithms.neuralnetwork.NeuralNetwork;
 import me.bausano.algorithms.neuralnetwork.Trainer;
@@ -19,10 +21,9 @@ public class Main {
         // Loads the training data input.
         DataSet data = DataSet.from(Paths.get(Settings.TRAINING_FILE_PATH), Settings.CROSSFOLD_FACTOR);
 
-        // Creates and trains a network.
-        NeuralNetwork network = NeuralNetwork.fromBlueprint(new int[]{ 64, 24, 10 });
-        new Trainer(network, data.setForTraining).train();
+        Collab collaboration = new Collab(data.setForTraining);
+        collaboration.train();
 
-        Reporter.assess("Neural Network", network, data.setForValidation);
+        Reporter.assess("Multiple networks plus nearest neighbour", collaboration, data.setForValidation);
     }
 }

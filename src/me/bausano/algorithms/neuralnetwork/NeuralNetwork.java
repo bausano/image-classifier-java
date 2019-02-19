@@ -17,15 +17,22 @@ public class NeuralNetwork implements Classifier {
     /**
      * Used to map neurons to classes. Indices associated neurons and values are output classes.
      */
-    private final int[] classMapping;
+    public final int[] mapNeuronToDigit;
+
+    /**
+     * Used to map neurons to classes. Indices associated neurons and values are output classes.
+     */
+    public final int[] mapDigitToNeuron;
 
     /**
      * @param layers Array of network layers
-     * @param classMapping Converts neurons to classes
+     * @param mapNeuronToDigit Converts neurons to classes
+     * @param mapDigitToNeuron Converts classes to neurons
      */
-    private NeuralNetwork(Layer[] layers, int[] classMapping) {
+    private NeuralNetwork(Layer[] layers, int[] mapNeuronToDigit, int[] mapDigitToNeuron) {
         this.layers = layers;
-        this.classMapping = classMapping;
+        this.mapNeuronToDigit = mapNeuronToDigit;
+        this.mapDigitToNeuron = mapDigitToNeuron;
     }
 
     /**
@@ -33,10 +40,11 @@ public class NeuralNetwork implements Classifier {
      * represents number of layers and each element number of neurons within the layer.
      *
      * @param schema Layers and neurons including input and output layer
-     * @param classMapping Holds information about which output neuron represents which class
+     * @param mapNeuronToDigit Holds information about which output neuron represents which class
+     * @param mapDigitToNeuron Holds information about which class is bound to which neuron
      * @return New instance of an untrained network
      */
-    public static NeuralNetwork fromBlueprint(int[] schema, int[] classMapping) {
+    public static NeuralNetwork fromBlueprint(int[] schema,  int[] mapNeuronToDigit, int[] mapDigitToNeuron) {
         PrimitiveIterator.OfDouble rng = new Random().doubles().iterator();
 
         Layer[] layers = new Layer[schema.length - 1];
@@ -46,7 +54,7 @@ public class NeuralNetwork implements Classifier {
             // We create a new layer array (collection of neurons). It's going to have number of neurons according to
             // the schema and each neuron will have weight according to number of neurons in previous layer plus a bias.
             double[][] weights = new double[schema[layerIndex]][schema[layerIndex - 1]];
-            double[] biasses = new double[schema[layerIndex]];
+            double[] biases = new double[schema[layerIndex]];
 
             // Generate each layer neuron.
             for (int neuronIndex = 0; neuronIndex < schema[layerIndex]; neuronIndex++) {
@@ -57,15 +65,15 @@ public class NeuralNetwork implements Classifier {
                 }
 
                 // Sets the bias to be 0. It does not matter how we initially set bias as the activation is always 1.
-                biasses[neuronIndex] = 0d;
+                biases[neuronIndex] = 0d;
             }
 
             // Since we are not creating the input layer, we have to decrement layer index by one when assigning it to
             // the layers array.
-            layers[layerIndex - 1] = new Layer(weights, biasses);
+            layers[layerIndex - 1] = new Layer(weights, biases);
         }
 
-        return new NeuralNetwork(layers, classMapping);
+        return new NeuralNetwork(layers, mapNeuronToDigit, mapDigitToNeuron);
     }
 
     /**
@@ -75,7 +83,11 @@ public class NeuralNetwork implements Classifier {
      * @return New instance of an untrained network
      */
     public static NeuralNetwork fromBlueprint(int[] schema) {
-        return NeuralNetwork.fromBlueprint(schema, new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        return NeuralNetwork.fromBlueprint(
+                schema,
+                new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+                new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+        );
     }
 
     /**
@@ -87,6 +99,11 @@ public class NeuralNetwork implements Classifier {
 
         // Feeds forward the inputs and gathers the results on output neurons.
         double[] probabilities = feedForward(digit);
+
+        System.out.println();
+        for (double prob : probabilities) {
+            System.out.printf("%.2f, ", prob);
+        }
 
         // Each of the probabilities corresponds to one output neuron.
         for (int neuronIndex = 0; neuronIndex < probabilities.length; neuronIndex++) {
@@ -100,7 +117,7 @@ public class NeuralNetwork implements Classifier {
             candidateProbability = probabilities[neuronIndex];
         }
 
-        return classMapping[candidate];
+        return mapNeuronToDigit[candidate];
     }
 
     /**
