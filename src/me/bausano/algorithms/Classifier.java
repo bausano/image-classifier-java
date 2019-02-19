@@ -10,4 +10,12 @@ public interface Classifier {
      */
     int classify (double[] digit);
 
+    /**
+     * Gives probabilities for each class.
+     *
+     * @param digit Input digit
+     * @return Vector of probabilities in range 0 - 1
+     */
+    double[] estimate (double[] digit);
+
 }

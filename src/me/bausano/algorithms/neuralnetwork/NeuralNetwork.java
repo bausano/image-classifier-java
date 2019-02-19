@@ -1,5 +1,6 @@
 package me.bausano.algorithms.neuralnetwork;
 
+import me.bausano.Settings;
 import me.bausano.algorithms.Classifier;
 
 import java.util.Arrays;
@@ -100,11 +101,6 @@ public class NeuralNetwork implements Classifier {
         // Feeds forward the inputs and gathers the results on output neurons.
         double[] probabilities = feedForward(digit);
 
-        System.out.println();
-        for (double prob : probabilities) {
-            System.out.printf("%.2f, ", prob);
-        }
-
         // Each of the probabilities corresponds to one output neuron.
         for (int neuronIndex = 0; neuronIndex < probabilities.length; neuronIndex++) {
             // If candidate's probability is higher than that of iterated neuron, skip.
@@ -118,6 +114,37 @@ public class NeuralNetwork implements Classifier {
         }
 
         return mapNeuronToDigit[candidate];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public double[] estimate(double[] digit) {
+        // Default each class with -1, which represents "I don't know".
+        double[] digitProbabilities = new double[Settings.OUTPUT_CLASSES_COUNT];
+
+        // Feeds forward the inputs and gathers the results on output neurons.
+        double[] neuronProbabilities = feedForward(digit);
+
+        // If the last digit represents IDK (I don't know this class) value (-1), then it prefills all class values with
+        // the probability of IDK neuron.
+        Arrays.fill(
+                digitProbabilities,
+                mapNeuronToDigit[mapNeuronToDigit.length - 1] == -1
+                        ? neuronProbabilities[neuronProbabilities.length - 1]
+                        : -1
+        );
+
+        for (int neuronIndex = 0; neuronIndex < neuronProbabilities.length; neuronIndex++) {
+            // Neuron -1 has a special meaning. It is a shadow neuron that represents IDK value.
+            if (mapNeuronToDigit[neuronIndex] == -1) {
+                continue;
+            }
+
+            digitProbabilities[mapNeuronToDigit[neuronIndex]] = neuronProbabilities[neuronIndex];
+        }
+
+        return digitProbabilities;
     }
 
     /**

@@ -1,5 +1,6 @@
 package me.bausano.algorithms.collab;
 
+import me.bausano.Settings;
 import me.bausano.algorithms.Classifier;
 import me.bausano.algorithms.nearestneighbour.NearestNeighbour;
 import me.bausano.algorithms.neuralnetwork.NeuralNetwork;
@@ -55,20 +56,60 @@ public class Collab implements Classifier {
      * @inheritDoc
      */
     public int classify (double[] digit) {
-        int groupAClass = groupA.classify(digit);
-        int groupBClass = groupB.classify(digit);
-        int nnClass = nn.classify(digit);
+        double[] estimates = this.estimate(digit);
 
-        System.out.printf("\nA: %d, B: %d, NN: %d", groupAClass, groupBClass, nnClass);
+        double maxEstimate = 0;
+        int maxEstimateClass = 0;
 
-        if (groupAClass == -1 && groupBClass != -1) {
-            return groupBClass;
+        // Finds the maximum estimate class.
+        for (int classIndex = 0; classIndex < estimates.length; classIndex++) {
+            if (estimates[classIndex] < maxEstimate) {
+                continue;
+            }
+
+            maxEstimate = estimates[classIndex];
+            maxEstimateClass = classIndex;
         }
 
-        if (groupBClass == -1 && groupAClass != -1) {
-            return groupAClass;
+        System.out.printf("\nclass %d: ", maxEstimateClass);
+        for (int classIndex = 0; classIndex < estimates.length; classIndex++) {
+            System.out.printf("(%d) %.2f, ", classIndex, estimates[classIndex]);
         }
 
-        return nnClass;
+        return maxEstimateClass;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public double[] estimate(double[] digit) {
+        double[] estimates = nn.estimate(digit);
+
+        System.out.print("\nknn: ");
+        for (int classIndex = 0; classIndex < estimates.length; classIndex++) {
+            System.out.printf("(%d) %.2f, ", classIndex, estimates[classIndex]);
+        }
+
+        addPartialEstimates(estimates, groupA.estimate(digit));
+        addPartialEstimates(estimates, groupB.estimate(digit));
+
+        return estimates;
+    }
+
+    /**
+     * Adds estimates array into base array.
+     *
+     * @param base Array that is going to be summed into
+     * @param estimates Array to sum from
+     */
+    private void addPartialEstimates(double[] base, double[] estimates) {
+        System.out.print("\nnn: ");
+        for (int classIndex = 0; classIndex < estimates.length; classIndex++) {
+            System.out.printf("(%d) %.2f, ", classIndex, estimates[classIndex]);
+        }
+
+        for (int classIndex = 0; classIndex < Settings.OUTPUT_CLASSES_COUNT; classIndex++) {
+            base[classIndex] += estimates[classIndex];
+        }
     }
 }
