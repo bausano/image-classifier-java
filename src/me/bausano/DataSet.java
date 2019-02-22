@@ -29,19 +29,12 @@ public class DataSet {
     }
 
     /**
-     * Instantiates data set for testing;
-     *
-     * @param validatingData Array of digits that are going to be used for assessing the performance
-     */
-    private DataSet(double[][] validatingData) {
-        this.setForTraining = new double[0][Settings.INPUT_PARAMETERS_LENGTH];
-        this.setForValidation = validatingData;
-    }
-
-    /**
-     * DataSet builder.
+     * DataSet builder. Factor splits data in ratio:
+     * training data FACTOR : 1 validation data
+     * For input value 0, all data are considered validating. For input value -1, all data are considered training.
      *
      * @param path Path to the data file
+     * @param factor What part of the data is meant to be used for training and what for validating
      * @throws IOException Since reading the files is crucial, we want the program to panic on error in reading the
      *                      input file
      */
@@ -52,8 +45,20 @@ public class DataSet {
             .map(DataSet::convertToDigit)
             .toArray(double[][]::new);
 
+        // If factor is zero, initiates new validation data set. Useful for testing data inputs.
         if (factor == 0) {
-            return new DataSet(data);
+            return new DataSet(
+                    new double[0][Settings.INPUT_PARAMETERS_LENGTH],
+                    data
+            );
+        }
+
+        // If factor is -1, initiates new training data set. Useful for training data inputs.
+        if (factor == -1) {
+            return new DataSet(
+                    data,
+                    new double[0][Settings.INPUT_PARAMETERS_LENGTH]
+            );
         }
 
         // All data with index lower than boundary are training data (exclusive), all above are validating data.

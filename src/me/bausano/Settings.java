@@ -19,7 +19,7 @@ public class Settings {
      * What portion of training data should be used for cross fold validation. The program will omit these data when it
      * trains. Then it uses that data to calculate how successful the program is.
      */
-    public static final int CROSSFOLD_FACTOR = 10;
+    public static final int CROSSFOLD_FACTOR = 2;
 
     /**
      * After how many data samples should the neural network update its weights.
@@ -29,27 +29,27 @@ public class Settings {
     /**
      * Hyper-parameter for cycling learning rate that indicates how many batches does one half of the cycle last.
      */
-    public static final int STEP_SIZE = 8;
+    public static final int STEP_SIZE = 16;
 
     /**
      * Used to calculate number of iterations for training. The formula is
-     * iterations = CYCLES * (STEP_SIZE * 3) + 1
+     * iterations = CYCLES * (STEP_SIZE * 2) + STEP_SIZE + 1
      * This ensures that the network will stop training the when learning rate is the lowest, which gives the best
      * accuracy.
      */
-    public static final int CYCLES = 30;
+    public static final int CYCLES = 20;
 
     /**
-     * Initial learning rate that will decrease with each epoch and also cycled around.
+     * Initial learning rate that will decrease with each epoch and also is cycled around.
      */
-    public static final double MEAN_LEARNING_RATE = 6d;
+    public static final double MEAN_LEARNING_RATE = 3d;
 
     /**
      * How much should the learning rate be changed throughout the cycling.
      * For example, if the learning rate is 3 and we oscillate by 0.5, learning rate will change from 3.5 to 2.5 during
      * first step, to 3.5 during second step.
      */
-    public static final double OSCILLATION = 0.5d;
+    public static final double OSCILLATION = 2.5d;
 
     /**
      * File path to the training file relative to the project root.

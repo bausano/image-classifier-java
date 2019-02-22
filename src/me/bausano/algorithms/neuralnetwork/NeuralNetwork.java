@@ -61,8 +61,8 @@ public class NeuralNetwork implements Classifier {
             for (int neuronIndex = 0; neuronIndex < schema[layerIndex]; neuronIndex++) {
                 // Generate each layer weight based on number of neurons in previous layer.
                 for (int weightIndex = 0; weightIndex < schema[layerIndex - 1]; weightIndex++) {
-                    // Weight is a double in range <-1;1).
-                    weights[neuronIndex][weightIndex] = rng.next() * 2d - 1d;
+                    // Weight is a double in range <-0.25;0.25).
+                    weights[neuronIndex][weightIndex] = (rng.next() - 0.5d) / 2;
                 }
 
                 // Sets the bias to be 0. It does not matter how we initially set bias as the activation is always 1.

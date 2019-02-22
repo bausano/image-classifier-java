@@ -1,7 +1,6 @@
 package me.bausano;
 
 import me.bausano.algorithms.Classifier;
-import me.bausano.algorithms.nearestneighbour.NearestNeighbour;
 
 public class Reporter {
 
@@ -18,8 +17,6 @@ public class Reporter {
 
             if (classifier.classify(digit) == digit[digit.length - 1]) {
                 correctlyClassified++;
-            } else {
-                System.out.printf("\nCorrect: %d", (int) digit[digit.length - 1]);
             }
         }
 

@@ -7,7 +7,7 @@ public class Trainer {
     /**
      * Sets number of iteration so that the network always finishes the training when the learning rate is lowest.
      */
-    private final int iterations = Settings.CYCLES * (Settings.STEP_SIZE * 3) + 1;
+    private final int iterations = Settings.CYCLES * (Settings.STEP_SIZE * 2) + Settings.STEP_SIZE + 1;
 
     /**
      * Training data.
