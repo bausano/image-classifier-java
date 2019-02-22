@@ -19,7 +19,7 @@ public class Settings {
      * What portion of training data should be used for cross fold validation. The program will omit these data when it
      * trains. Then it uses that data to calculate how successful the program is.
      */
-    public static final int CROSSFOLD_FACTOR = 2;
+    public static final int CROSSFOLD_FACTOR = 10;
 
     /**
      * After how many data samples should the neural network update its weights.

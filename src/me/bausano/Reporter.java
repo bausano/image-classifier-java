@@ -65,7 +65,7 @@ public class Reporter {
             }
         }
 
-        System.out.println("--- Confusion matrix ----------");
+        System.out.println("\n--- Confusion matrix ----------");
 
         for (int[] target : matrix) {
             System.out.printf("| ");

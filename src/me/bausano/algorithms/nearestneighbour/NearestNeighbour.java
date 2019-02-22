@@ -56,8 +56,15 @@ public class NearestNeighbour implements Classifier {
         Arrays.fill(distances, 1);
 
         for (double[] neighbour : neighbours) {
-            // Calculates how similar the digit is to iterated neighbour.
-            distances[(int) neighbour[neighbour.length - 1]] += calculateDistance(digit, neighbour);
+            int target = (int) neighbour[neighbour.length - 1];
+            double distance = calculateDistance(digit, neighbour);
+
+            // If we already have better neighbour for given digit in target class, skip.
+            if (distance > distances[target]) {
+                continue;
+            }
+
+            distances[target] = distance;
         }
 
         // Lowest distance total.

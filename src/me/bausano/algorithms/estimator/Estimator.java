@@ -1,4 +1,4 @@
-package me.bausano.algorithms.collab;
+package me.bausano.algorithms.estimator;
 
 import me.bausano.Settings;
 import me.bausano.algorithms.Classifier;
@@ -6,7 +6,7 @@ import me.bausano.algorithms.nearestneighbour.NearestNeighbour;
 import me.bausano.algorithms.neuralnetwork.NeuralNetwork;
 import me.bausano.algorithms.neuralnetwork.Trainer;
 
-public class Collab implements Classifier {
+public class Estimator implements Classifier {
 
     /**
      * Data set of structured input data to train on.
@@ -14,22 +14,22 @@ public class Collab implements Classifier {
     private final double[][] data;
 
     /**
-     * Network only for numbers 0, 1, 3, 6 and 9.
+     * The numbers are split into groups.
      */
-    private NeuralNetwork groupA = NeuralNetwork.fromBlueprint(
-            new int[] { 64, 24, 6 },
-            new int[] { 0, 1, 3, 6, 9, -1 },
-            new int[] { 0, 1, 5, 2, 5, 5, 3, 5, 5, 4 }
-    );
-
-    /**
-     * Train network only for numbers 2, 4, 5, 7 and 8.
-     */
-    private NeuralNetwork groupB = NeuralNetwork.fromBlueprint(
-            new int[] { 64, 24, 6 },
-            new int[] { 2, 4, 5, 7, 8, -1 },
-            new int[] { 5, 5, 0, 5, 1, 2, 5, 3, 4, 5 }
-    );
+    private NeuralNetwork[] groups = new NeuralNetwork[] {
+            // Train network only for numbers 2, 4, 5, 7 and 8.
+            NeuralNetwork.fromBlueprint(
+                    new int[]{ 64, 24, 6 },
+                    new int[]{ 2, 4, 5, 7, 8, -1 },
+                    new int[]{ 5, 5, 0, 5, 1, 2, 5, 3, 4, 5 }
+            ),
+            // Network only for numbers 0, 1, 3, 6 and 9.
+            NeuralNetwork.fromBlueprint(
+                    new int[] { 64, 24, 6 },
+                    new int[] { 0, 1, 3, 6, 9, -1 },
+                    new int[] { 0, 1, 5, 2, 5, 5, 3, 5, 5, 4 }
+            )
+    };
 
     /**
      * Nearest neighbour instance.
@@ -39,7 +39,7 @@ public class Collab implements Classifier {
     /**
      * @param data Input data set where last int is the class
      */
-    public Collab(double[][] data) {
+    public Estimator(double[][] data) {
         this.data = data;
         this.nn = new NearestNeighbour(data);
     }
@@ -48,8 +48,9 @@ public class Collab implements Classifier {
      * Trains the algorithm.
      */
     public void train() {
-        new Trainer(groupA, data).train();
-        new Trainer(groupB, data).train();
+        for (NeuralNetwork group : groups) {
+            new Trainer(group, data).train();
+        }
     }
 
     /**
@@ -71,10 +72,7 @@ public class Collab implements Classifier {
             maxEstimateClass = classIndex;
         }
 
-        System.out.printf("\nclass %d: ", maxEstimateClass);
-        for (int classIndex = 0; classIndex < estimates.length; classIndex++) {
-            System.out.printf("(%d) %.2f, ", classIndex, estimates[classIndex]);
-        }
+        printEstimates("As " + maxEstimateClass, estimates);
 
         return maxEstimateClass;
     }
@@ -85,13 +83,11 @@ public class Collab implements Classifier {
     public double[] estimate(double[] digit) {
         double[] estimates = nn.estimate(digit);
 
-        System.out.print("\nknn: ");
-        for (int classIndex = 0; classIndex < estimates.length; classIndex++) {
-            System.out.printf("(%d) %.2f, ", classIndex, estimates[classIndex]);
-        }
+        printEstimates("KNN ", estimates);
 
-        addPartialEstimates(estimates, groupA.estimate(digit));
-        addPartialEstimates(estimates, groupB.estimate(digit));
+        for (NeuralNetwork group : groups) {
+            addPartialEstimates(estimates, group.estimate(digit));
+        }
 
         return estimates;
     }
@@ -103,13 +99,21 @@ public class Collab implements Classifier {
      * @param estimates Array to sum from
      */
     private void addPartialEstimates(double[] base, double[] estimates) {
-        System.out.print("\nnn: ");
-        for (int classIndex = 0; classIndex < estimates.length; classIndex++) {
-            System.out.printf("(%d) %.2f, ", classIndex, estimates[classIndex]);
-        }
+        printEstimates(".NN ", estimates);
 
         for (int classIndex = 0; classIndex < Settings.OUTPUT_CLASSES_COUNT; classIndex++) {
             base[classIndex] += estimates[classIndex];
+        }
+    }
+
+    private void printEstimates(String title, double[] estimates) {
+        if (true) {
+            return;
+        }
+
+        System.out.printf("\n%s: ", title);
+        for (int classIndex = 0; classIndex < estimates.length; classIndex++) {
+            System.out.printf("(%d) %.2f, ", classIndex, estimates[classIndex]);
         }
     }
 }

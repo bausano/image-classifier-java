@@ -1,10 +1,7 @@
 package me.bausano;
 
 import me.bausano.algorithms.Classifier;
-import me.bausano.algorithms.collab.Collab;
-import me.bausano.algorithms.nearestneighbour.NearestNeighbour;
-import me.bausano.algorithms.neuralnetwork.NeuralNetwork;
-import me.bausano.algorithms.neuralnetwork.Trainer;
+import me.bausano.algorithms.estimator.Estimator;
 
 import java.nio.file.Paths;
 
@@ -21,9 +18,10 @@ public class Main {
         // Loads the training data input.
         DataSet data = DataSet.from(Paths.get(Settings.TRAINING_FILE_PATH), Settings.CROSSFOLD_FACTOR);
 
-        Collab collaboration = new Collab(data.setForTraining);
+        Estimator collaboration = new Estimator(data.setForTraining);
         collaboration.train();
 
         Reporter.assess("Multiple networks plus nearest neighbour", collaboration, data.setForValidation);
+        Reporter.printConfusionMatrix(new Classifier[]{ collaboration }, data.setForValidation);
     }
 }
