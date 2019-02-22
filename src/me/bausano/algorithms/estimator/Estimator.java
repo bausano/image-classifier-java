@@ -68,11 +68,10 @@ public class Estimator implements Classifier {
                 continue;
             }
 
+            // Updates the best result.
             maxEstimate = estimates[classIndex];
             maxEstimateClass = classIndex;
         }
-
-        printEstimates("As " + maxEstimateClass, estimates);
 
         return maxEstimateClass;
     }
@@ -82,8 +81,6 @@ public class Estimator implements Classifier {
      */
     public double[] estimate(double[] digit) {
         double[] estimates = nn.estimate(digit);
-
-        printEstimates("KNN ", estimates);
 
         for (NeuralNetwork group : groups) {
             addPartialEstimates(estimates, group.estimate(digit));
@@ -99,21 +96,9 @@ public class Estimator implements Classifier {
      * @param estimates Array to sum from
      */
     private void addPartialEstimates(double[] base, double[] estimates) {
-        printEstimates(".NN ", estimates);
-
         for (int classIndex = 0; classIndex < Settings.OUTPUT_CLASSES_COUNT; classIndex++) {
             base[classIndex] += estimates[classIndex];
         }
     }
 
-    private void printEstimates(String title, double[] estimates) {
-        if (true) {
-            return;
-        }
-
-        System.out.printf("\n%s: ", title);
-        for (int classIndex = 0; classIndex < estimates.length; classIndex++) {
-            System.out.printf("(%d) %.2f, ", classIndex, estimates[classIndex]);
-        }
-    }
 }

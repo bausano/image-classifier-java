@@ -38,10 +38,12 @@ public class Layer {
         for (int neuronIndex = 0; neuronIndex < neurons.length; neuronIndex++) {
             double product = biases[neuronIndex];
 
+            // Multiplies matrix of weights with inputs matrix.
             for (int weightIndex = 0; weightIndex < neurons[neuronIndex].length; weightIndex++) {
                 product += neurons[neuronIndex][weightIndex] * inputs[weightIndex];
             }
 
+            // Maps the output through an activation function.
             outputs[neuronIndex] = Settings.activation.function.apply(product);
         }
 

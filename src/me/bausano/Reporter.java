@@ -62,18 +62,13 @@ public class Reporter {
             }
         }
 
+        // Prints it into the stdout.
         System.out.println("\n--- Confusion matrix ----------");
-
         for (int[] target : matrix) {
-            System.out.printf("| ");
-
-            for (int classification : target) {
-                System.out.printf("%d, ", classification);
-            }
-
+            System.out.print("| ");
+            for (int classification : target) System.out.printf("%d, ", classification);
             System.out.print("|\n");
         }
-
         System.out.println("------------------------------");
     }
 

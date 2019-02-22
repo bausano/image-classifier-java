@@ -4,7 +4,6 @@ import me.bausano.Settings;
 import me.bausano.algorithms.Classifier;
 
 import java.util.Arrays;
-import java.util.stream.DoubleStream;
 
 public class NearestNeighbour implements Classifier {
 
