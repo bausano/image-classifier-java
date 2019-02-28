@@ -13,7 +13,7 @@ public class Settings {
      * Defines over how many input parameters are we working on. This is useful for constructing arrays of static length
      * which brings performance benefits.
      */
-    public static final int INPUT_PARAMETERS_LENGTH = 64;
+    public static final int INPUT_PARAMETERS = 64;
 
     /**
      * How many output classes are there. For digit classification, there's 10 (0-9).
@@ -77,18 +77,24 @@ public class Settings {
      * number of inputs the new digit will have is INPUTS + FILTERS.LENGTH * INPUTS.
      */
     public static final double[][][] FILTERS = new double[][][] {
-        // Detects horizontal edges.
-        new double[][] {
-                new double[] { 1, 1, 1, },
-                new double[] { 0, 0, 0, },
-                new double[] { -1, -1, -1, },
-        },
-        // Detects vertical edges.
-        new double[][] {
-                new double[] { 1, 0, -1, },
-                new double[] { 1, 0, -1, },
-                new double[] { 1, 0, -1, },
-        },
+            // Detects horizontal edges.
+            new double[][] {
+                    new double[] { 1, 1, 1, },
+                    new double[] { 0, 0, 0, },
+                    new double[] { -1, -1, -1, },
+            },
+            // Detects vertical edges.
+            new double[][] {
+                    new double[] { 1, 0, -1, },
+                    new double[] { 1, 0, -1, },
+                    new double[] { 1, 0, -1, },
+            },
     };
+
+    /**
+     * Defines how many input neurons should be used. This number is calculated by multiplying the number of pixels
+     * by number of filters plus the original image.
+     */
+    public static final int INPUT_NEURONS = INPUT_PARAMETERS + INPUT_PARAMETERS * FILTERS.length;
 
 }

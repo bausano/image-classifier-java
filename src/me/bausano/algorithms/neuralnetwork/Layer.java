@@ -50,4 +50,24 @@ public class Layer {
         return outputs;
     }
 
+    /**
+     * Deep clones the layer.
+     *
+     * @return New layer instance with same weights and biases.
+     */
+    public Layer copy () {
+        double[][] newNeurons = new double[neurons.length][neurons[0].length];
+        double[] newBiases = new double[biases.length];
+
+        // Copy neurons.
+        for (int neuronIndex = 0; neuronIndex < neurons.length; neuronIndex++) {
+            System.arraycopy(neurons[neuronIndex], 0, newNeurons[neuronIndex], 0, neurons[neuronIndex].length);
+        }
+
+        // Copy biases.
+        System.arraycopy(biases, 0, newBiases, 0, biases.length);
+
+        return new Layer(newNeurons, newBiases);
+    }
+
 }

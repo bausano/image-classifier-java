@@ -77,8 +77,8 @@ public class NearestNeighbour implements Classifier {
      * Calculates distance between two vectors. To find the Euclidean distance, the result needs to be square rooted.
      * This is however not necessary to do for this algorithm, therefore we can avoid the computation.
      *
-     * @param from Point which has at least Settings.INPUT_PARAMETERS_LENGTH length
-     * @param to Point which has at least Settings.INPUT_PARAMETERS_LENGTH length
+     * @param from Point which has at least Settings.INPUT_PARAMETERS length
+     * @param to Point which has at least Settings.INPUT_PARAMETERS length
      * @return Distance between the two multi dimensional points
      */
     private double calculateDistance (double[] from, double[] to) {

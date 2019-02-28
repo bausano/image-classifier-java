@@ -148,6 +148,25 @@ public class NeuralNetwork implements Classifier {
     }
 
     /**
+     * Clones the last hidden layer and creates a new layer array with size layers.length + 1. This can be used to
+     * iteratively add layers and avoid gradient fading problem.
+     */
+    public void expand () {
+        Layer[] newLayers = new Layer[layers.length + 1];
+
+        // Moves over the output layer.
+        newLayers[newLayers.length - 1] = layers[layers.length - 1];
+        // Clones last hidden layer and adds it before the output layer.
+        newLayers[newLayers.length - 2] = layers[layers.length - 2].copy();
+
+        // Moves over the rest of the layers.
+        System.arraycopy(layers, 0, newLayers, 0, layers.length - 1);
+
+        // Assigns this newly created array to the network.
+        this.layers = newLayers;
+    }
+
+    /**
      * Folds the layers starting with input values and finishing with output layer's activations.
      *
      * @param digit Input digit with pixels

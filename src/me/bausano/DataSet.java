@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Set;
 
 public class DataSet {
 
@@ -49,7 +48,7 @@ public class DataSet {
         // If factor is zero, initiates new validation data set. Useful for testing data inputs.
         if (factor == 0) {
             return new DataSet(
-                    new double[0][Settings.INPUT_PARAMETERS_LENGTH],
+                    new double[0][Settings.INPUT_PARAMETERS],
                     data
             );
         }
@@ -58,7 +57,7 @@ public class DataSet {
         if (factor == -1) {
             return new DataSet(
                     data,
-                    new double[0][Settings.INPUT_PARAMETERS_LENGTH]
+                    new double[0][Settings.INPUT_PARAMETERS]
             );
         }
 
@@ -97,7 +96,7 @@ public class DataSet {
      */
     private static double[] mapDigitThroughFilters(double[] digit, double[][][] filters) {
         // New image will be composed out of the main image and its mutations under each filter plus the target.
-        double[] output = new double[Settings.INPUT_PARAMETERS_LENGTH * (filters.length + 1) + 1];
+        double[] output = new double[Settings.INPUT_PARAMETERS * (filters.length + 1) + 1];
         // Sets the last value as target (classification 0 - 9).
         output[output.length - 1] = digit[digit.length - 1];
 
@@ -107,17 +106,10 @@ public class DataSet {
         for (int filterIndex = 0; filterIndex < filters.length; filterIndex++) {
             // Filters each pixel through a matrix (usually 3x3) with weights. The matrix is set to benefit certain shapes
             // such as corners.
-            for (int pixel = 0; pixel < Settings.INPUT_PARAMETERS_LENGTH; pixel++) {
+            for (int pixel = 0; pixel < Settings.INPUT_PARAMETERS; pixel++) {
                 double mappedValue = mapFilterToPixel(digit, pixel, filters[filterIndex]);
-                output[pixel + Settings.INPUT_PARAMETERS_LENGTH * (filterIndex + 1)] = mappedValue;
+                output[pixel + Settings.INPUT_PARAMETERS * (filterIndex + 1)] = mappedValue;
             }
-        }
-
-        // Asserting the input is equal the output. This condition should always be true as long as I have not made a
-        // mistake in the mapping.
-        if (output[output.length - 1] != digit[digit.length - 1]) {
-            System.out.print("Filter applying algorithm does not work properly.");
-            System.exit(1);
         }
 
         return output;
@@ -133,7 +125,7 @@ public class DataSet {
      */
     private static double mapFilterToPixel(double[] digit, int pixel, double[][] filter) {
         // How many pixels are on one row of the digit.
-        int rowLength = (int) Math.sqrt(Settings.INPUT_PARAMETERS_LENGTH);
+        int rowLength = (int) Math.sqrt(Settings.INPUT_PARAMETERS);
 
         // New pixel value.
         double checksum = 0d;
@@ -146,7 +138,7 @@ public class DataSet {
                 // index out of bounds error.
                 if (
                         targetPixel >= (Math.floor((double) targetPixel / rowLength) + 1) * rowLength ||
-                        targetPixel > Settings.INPUT_PARAMETERS_LENGTH
+                        targetPixel > Settings.INPUT_PARAMETERS
                 ) {
                     break;
                 }

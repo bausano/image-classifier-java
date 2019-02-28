@@ -28,19 +28,28 @@ public class Main {
         System.out.println("Testing data set ready.");
 
         // Instantiates a neural network with random weights and and trains it.
-        NeuralNetwork mlp = NeuralNetwork.fromBlueprint(new int[] { 191, 128, 32, 10 });
-        // new Trainer(mlp, inputData.setForTraining).train();
+        Thread runMlp = new Thread(() -> {
+            NeuralNetwork mlp = NeuralNetwork.fromBlueprint(new int[] { Settings.INPUT_NEURONS, 37, 10 });
+            new Trainer(mlp, inputData.setForTraining).train();
+            Reporter.assess("Neural Network", mlp, testingData.setForValidation);
+        });
 
-        // Creates new nearest neighbour instance.
-        NearestNeighbour knn = new NearestNeighbour(inputData.setForTraining);
+        // Creates new nearest neighbour instance and runs it.
+        Thread runNN = new Thread(() -> {
+            NearestNeighbour knn = new NearestNeighbour(inputData.setForTraining);
+            Reporter.assess("Nearest neighbour", knn, testingData.setForValidation);
+        });
 
-        // Creates new instance of estimator which is combined mlp and knn.
-        Estimator estimator = new Estimator(inputData.setForTraining);
-        estimator.train();
+        // Creates and trains new instance of estimator which is combined mlp and knn.
+        Thread runEstimator = new Thread(() -> {
+            Estimator estimator = new Estimator(inputData.setForTraining);
+            estimator.train();
+            Reporter.assess("Estimator", estimator, testingData.setForValidation);
+        });
 
-        // Reports on the algorithms.
-        Reporter.assess("Neural Network", mlp, testingData.setForValidation);
-        Reporter.assess("Nearest neighbour", knn, testingData.setForValidation);
-        Reporter.assess("Estimator", estimator, testingData.setForValidation);
+        // Comment out any of following lines to prevent algorithm from running (advised on slow machines).
+        runMlp.start();
+        runNN.start();
+        runEstimator.start();
     }
 }
