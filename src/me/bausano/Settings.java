@@ -5,6 +5,11 @@ import me.bausano.algorithms.neuralnetwork.ActivationMapper;
 public class Settings {
 
     /**
+     * K-nearest neighbours parameter k, which specifies how many closest neighbours get to vote on the classification.
+     */
+    public static final int K_NEAREST_NEIGHBOURS = 1;
+
+    /**
      * Defines over how many input parameters are we working on. This is useful for constructing arrays of static length
      * which brings performance benefits.
      */
@@ -66,5 +71,24 @@ public class Settings {
      * Activation function is used throughout all layers to indulge linearity.
      */
     public static final ActivationMapper activation = ActivationMapper.sigmoid();
+
+    /**
+     * Filters used to map the input digit. Each pixel is mapped over each over the filters, therefore the resulting
+     * number of inputs the new digit will have is INPUTS + FILTERS.LENGTH * INPUTS.
+     */
+    public static final double[][][] FILTERS = new double[][][] {
+        // Detects horizontal edges.
+        new double[][] {
+                new double[] { 1, 1, 1, },
+                new double[] { 0, 0, 0, },
+                new double[] { -1, -1, -1, },
+        },
+        // Detects vertical edges.
+        new double[][] {
+                new double[] { 1, 0, -1, },
+                new double[] { 1, 0, -1, },
+                new double[] { 1, 0, -1, },
+        },
+    };
 
 }

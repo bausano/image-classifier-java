@@ -14,18 +14,18 @@ public class Estimator implements Classifier {
     private final double[][] data;
 
     /**
-     * The numbers are split into groups.
+     * The numbers are split into groups. These groups are based on my observations from confusion matrix.
      */
     private NeuralNetwork[] groups = new NeuralNetwork[] {
             // Train network only for numbers 2, 4, 5, 7 and 8.
             NeuralNetwork.fromBlueprint(
-                    new int[]{ 64, 24, 6 },
+                    new int[]{ 191, 42, 6 },
                     new int[]{ 2, 4, 5, 7, 8, -1 },
                     new int[]{ 5, 5, 0, 5, 1, 2, 5, 3, 4, 5 }
             ),
             // Network only for numbers 0, 1, 3, 6 and 9.
             NeuralNetwork.fromBlueprint(
-                    new int[] { 64, 24, 6 },
+                    new int[] { 191, 42, 6 },
                     new int[] { 0, 1, 3, 6, 9, -1 },
                     new int[] { 0, 1, 5, 2, 5, 5, 3, 5, 5, 4 }
             )

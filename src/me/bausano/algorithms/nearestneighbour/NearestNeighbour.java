@@ -3,7 +3,7 @@ package me.bausano.algorithms.nearestneighbour;
 import me.bausano.Settings;
 import me.bausano.algorithms.Classifier;
 
-import java.util.Arrays;
+import java.util.PriorityQueue;
 
 public class NearestNeighbour implements Classifier {
 
@@ -24,22 +24,20 @@ public class NearestNeighbour implements Classifier {
      */
     public int classify (double[] digit) {
         // How close was the closest neighbour to the digit.
-        double closestDistance = Double.MAX_VALUE;
+        double bestEstimate = Double.MIN_VALUE;
         // Which class had the closest distance.
         int closestClass = 0;
 
-        for (double[] neighbour : neighbours) {
-            // Calculates how similar the digit is to iterated neighbour.
-            double distance = calculateDistance(digit, neighbour);
-
-            // If there was a neighbour with lower distance, go to next iteration.
-            if (distance > closestDistance) {
+        // Finds class with the highest estimate.
+        double[] estimates = estimate(digit);
+        for (int classIndex = 0; classIndex < estimates.length; classIndex++) {
+            if (estimates[classIndex] < bestEstimate) {
                 continue;
             }
 
-            // The last element of array is the classification.
-            closestClass = (int) neighbour[neighbour.length - 1];
-            closestDistance = distance;
+            // Updates the leading estimate.
+            closestClass = classIndex;
+            bestEstimate = estimates[classIndex];
         }
 
         return closestClass;
@@ -49,28 +47,30 @@ public class NearestNeighbour implements Classifier {
      * @inheritDoc
      */
     public double[] estimate(double[] digit) {
-        // For each digit class stores total distance to all of the neighbours. Defaults them with 1 to avoid zero
-        // division (which would never probably happen anyway but it didn't feel right not to do that).
-        double[] distances = new double[Settings.OUTPUT_CLASSES_COUNT];
-        Arrays.fill(distances, 1);
+        PriorityQueue<Neighbour> closestNeighbours = new PriorityQueue<>(Settings.K_NEAREST_NEIGHBOURS);
 
+        // Fills the queue with distances.
         for (double[] neighbour : neighbours) {
             int target = (int) neighbour[neighbour.length - 1];
             double distance = calculateDistance(digit, neighbour);
 
-            // If we already have better neighbour for given digit in target class, skip.
-            if (distance > distances[target]) {
-                continue;
-            }
+            closestNeighbours.add(new Neighbour(target, distance));
 
-            distances[target] = distance;
+            // Ensures there's not more than k neighbours in the fit queue.
+            if (closestNeighbours.size() > Settings.K_NEAREST_NEIGHBOURS) closestNeighbours.poll();
         }
 
-        // Lowest distance total.
-        double min = Arrays.stream(distances).min().getAsDouble();
+        double[] classes = new double[Settings.OUTPUT_CLASSES_COUNT];
+        for (int classIndex = 0; classIndex < classes.length; classIndex++) {
+            // Storage to close compilers mouth.
+            int target = classIndex;
+            // Counts occurrence of a class and divides it by total queue size.
+            classes[classIndex] = (double) closestNeighbours.stream()
+                    .filter((Neighbour x) -> x.classification == target)
+                    .count() / (double) Settings.K_NEAREST_NEIGHBOURS;
+        }
 
-        // Divides each distance total by the lowest total scaling them to range 0 - 1.
-        return Arrays.stream(distances).map(x -> min / x).toArray();
+        return classes;
     }
 
     /**
@@ -86,7 +86,7 @@ public class NearestNeighbour implements Classifier {
 
         // We assume both arrays will have adequate number of elements. These assumptions might possibly result in
         // better overall performance.
-        for (int pixel = 0; pixel < Settings.INPUT_PARAMETERS_LENGTH; pixel++) {
+        for (int pixel = 0; pixel < from.length - 1; pixel++) {
             double difference = from[pixel] - to[pixel];
 
             sum += difference * difference;

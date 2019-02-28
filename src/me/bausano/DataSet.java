@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Set;
 
 public class DataSet {
 
@@ -78,9 +79,83 @@ public class DataSet {
      * @return Array of doubles representing pixels and the last integer represents the class
      */
     private static double[] convertToDigit(String line) {
-        return Arrays.stream(line.split(","))
-                .mapToDouble(Double::parseDouble)
-                .toArray();
+        return mapDigitThroughFilters(
+                Arrays.stream(line.split(","))
+                        .mapToDouble(Double::parseDouble)
+                        .toArray(),
+                Settings.FILTERS
+        );
+    }
+
+    /**
+     * Maps digit through given filter. This is usually a 3x3 matrix of weights that highlight certain feature in the
+     * image, such as edges.
+     *
+     * @param digit Original digit
+     * @param filters Matrix of weights
+     * @return Changed digit
+     */
+    private static double[] mapDigitThroughFilters(double[] digit, double[][][] filters) {
+        // New image will be composed out of the main image and its mutations under each filter plus the target.
+        double[] output = new double[Settings.INPUT_PARAMETERS_LENGTH * (filters.length + 1) + 1];
+        // Sets the last value as target (classification 0 - 9).
+        output[output.length - 1] = digit[digit.length - 1];
+
+        // We copy all values from the original input into the new one.
+        System.arraycopy(digit, 0, output, 0, digit.length);
+
+        for (int filterIndex = 0; filterIndex < filters.length; filterIndex++) {
+            // Filters each pixel through a matrix (usually 3x3) with weights. The matrix is set to benefit certain shapes
+            // such as corners.
+            for (int pixel = 0; pixel < Settings.INPUT_PARAMETERS_LENGTH; pixel++) {
+                double mappedValue = mapFilterToPixel(digit, pixel, filters[filterIndex]);
+                output[pixel + Settings.INPUT_PARAMETERS_LENGTH * (filterIndex + 1)] = mappedValue;
+            }
+        }
+
+        // Asserting the input is equal the output. This condition should always be true as long as I have not made a
+        // mistake in the mapping.
+        if (output[output.length - 1] != digit[digit.length - 1]) {
+            System.out.print("Filter applying algorithm does not work properly.");
+            System.exit(1);
+        }
+
+        return output;
+    }
+
+    /**
+     * Maps given pixel and its neighbours over the filter.
+     *
+     * @param digit Original input image
+     * @param pixel Pixel index to map
+     * @param filter Filter matrix to apply
+     * @return Value for given pixel in given point
+     */
+    private static double mapFilterToPixel(double[] digit, int pixel, double[][] filter) {
+        // How many pixels are on one row of the digit.
+        int rowLength = (int) Math.sqrt(Settings.INPUT_PARAMETERS_LENGTH);
+
+        // New pixel value.
+        double checksum = 0d;
+        // Multiplies values of each neighbour pixel with one weight from the filter.
+        for (int rowShift = 0; rowShift < filter.length; rowShift++) {
+            for (int filterColumn = 0; filterColumn < filter[rowShift].length; filterColumn++) {
+                int targetPixel = rowLength * rowShift + pixel + filterColumn;
+
+                // Add check for the pixels that are on the edges (both vertically and horizontally). Prevents
+                // index out of bounds error.
+                if (
+                        targetPixel >= (Math.floor((double) targetPixel / rowLength) + 1) * rowLength ||
+                        targetPixel > Settings.INPUT_PARAMETERS_LENGTH
+                ) {
+                    break;
+                }
+
+                checksum += digit[targetPixel] * filter[rowShift][filterColumn];
+            }
+        }
+
+        return checksum;
     }
 
 }

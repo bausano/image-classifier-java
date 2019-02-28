@@ -14,7 +14,6 @@ public class Reporter {
     public static void assess (String title, Classifier classifier, double[][] data) {
         int correctlyClassified = 0;
         for (double[] digit : data) {
-
             if (classifier.classify(digit) == digit[digit.length - 1]) {
                 correctlyClassified++;
             }
